@@ -767,19 +767,22 @@
     const errorMessage = document.getElementById('error_message');
 
     // Если элементы найдены, добавляем слушатель события
-    if (form) {
-        form.addEventListener('submit', async function (event) {
-            // Предотвращаем стандартную отправку формы, чтобы избежать перенаправления
-            event.preventDefault();
+   // Заменили 'form' на 'contactForm'
+const contactForm = document.getElementById('contact_form');
+const successMessage = document.getElementById('success_message');
+const errorMessage = document.getElementById('error_message');
 
-            // Скрываем предыдущие сообщения
-            successMessage.style.display = 'none';
-            errorMessage.style.display = 'none';
+// Используем новое имя
+if (contactForm) {
+    contactForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-            // Собираем данные формы
-            const formData = new FormData(contact_form);
-            const formUrl = form.action;
+        successMessage.style.display = 'none';
+        errorMessage.style.display = 'none';
 
+        // Собираем данные через новое имя переменной
+        const formData = new FormData(contactForm);
+        const formUrl = contactForm.action;
             try {
                 // Отправляем данные на Formspree
                 const response = await fetch(formUrl, {
