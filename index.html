@@ -773,18 +773,17 @@
     });
     </script>
 
-    <script>
+   <script>
     var form = document.getElementById("contact_form");
     
     async function handleSubmit(event) {
-      event.preventDefault(); // Останавливаем стандартную отправку (перезагрузку)
+      event.preventDefault(); 
       var statusSuccess = document.getElementById("success_message");
       var statusError = document.getElementById("error_message");
       var submitButton = document.getElementById("send_message");
       var data = new FormData(event.target);
 
-      // Меняем текст на кнопке, чтобы пользователь видел процесс
-      submitButton.value = "Envoi в процессе...";
+      submitButton.value = "Envoi..."; // Кратко для кнопки
       submitButton.disabled = true;
 
       fetch(event.target.action, {
@@ -795,25 +794,24 @@
         }
       }).then(response => {
         if (response.ok) {
-          // Если всё ок: показываем сообщение об успехе и скрываем форму
-          statusSuccess.style.display = "block";
-          statusError.style.display = "none";
-          form.reset(); // Очищаем поля
-          form.style.display = "none"; // Можно скрыть форму совсем после успеха
+          // УСПЕХ
+          statusSuccess.style.display = "block"; // Показываем текст успеха
+          statusError.style.display = "none";    // Прячем ошибку, если была
+          form.reset();                          // Очищаем поля формы
+          
+          // Через 5 секунд скрываем сообщение об успехе (по желанию)
+          setTimeout(function(){ 
+             statusSuccess.style.display = "none"; 
+          }, 5000);
+
         } else {
-          // Если Formspree вернул ошибку
-          response.json().then(data => {
-            if (Object.hasOwn(data, 'errors')) {
-              statusError.innerHTML = data["errors"].map(error => error["message"]).join(", ");
-            } else {
-              statusError.style.display = "block";
-            }
-          })
+          // ОШИБКА Formspree
+          statusError.style.display = "block";
+          statusSuccess.style.display = "none";
         }
       }).catch(error => {
-        // Если ошибка сети
+        // ОШИБКА СЕТИ
         statusError.style.display = "block";
-        statusError.innerHTML = "Oups! Un problème est survenu.";
       }).finally(() => {
         submitButton.value = "Envoyer le message";
         submitButton.disabled = false;
