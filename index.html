@@ -578,7 +578,7 @@
                                         </div>
                                         <div class="post-text">
                                             <h4>L'électronique et l'Arduino</h4>
-                                            <p>C'est ma manière d'explorer la logique des systèmes et la programmation des microcontrôleurs. Une passion qui alimente ma rigueur technique dans la conception de vos installations domotiques.</p>
+                                            <p>C'est ma manière d'explorer la logique des systèmes и la programmation des microcontrôleurs. Cette passion, associée à une solide expertise en réparation électronique, alimente ma rigueur technique : je ne me contente pas d'installer, je comprends et maîtrise chaque composant de vos systèmes domotiques.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -774,53 +774,55 @@
     </script>
 
     <script>
-    // Получаем элементы
-    const form = document.getElementById('contactform');
-    const successMessage = document.getElementById('success_message');
-    const errorMessage = document.getElementById('error_message');
+    var form = document.getElementById("contact_form");
+    
+    async function handleSubmit(event) {
+      event.preventDefault(); // Останавливаем стандартную отправку (перезагрузку)
+      var statusSuccess = document.getElementById("success_message");
+      var statusError = document.getElementById("error_message");
+      var submitButton = document.getElementById("send_message");
+      var data = new FormData(event.target);
 
-    // Если элементы найдены, добавляем слушатель события
-   // Заменили 'form' на 'contactForm'
-const contactForm = document.getElementById('contactform');
+      // Меняем текст на кнопке, чтобы пользователь видел процесс
+      submitButton.value = "Envoi в процессе...";
+      submitButton.disabled = true;
 
-// Используем новое имя
-if (contactForm) {
-    contactForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        successMessage.style.display = 'none';
-        errorMessage.style.display = 'none';
-
-        // Собираем данные через новое имя переменной
-        const formData = new FormData(contactForm);
-        const formUrl = contactForm.action;
-            try {
-                // Отправляем данные на Formspree
-                const response = await fetch(formUrl, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        // Важно: Formspree рекомендует заголовок Accept для AJAX
-                        'Accept': 'application/json' 
-                    }
-                });
-
-                if (response.ok) {
-                    // Если ответ успешный (статус 200)
-                    successMessage.style.display = 'block'; // Показываем сообщение об успехе
-                    form.reset(); // Очищаем форму
-                } else {
-                    // Если произошла ошибка (например, 400 Bad Request)
-                    errorMessage.style.display = 'block'; // Показываем сообщение об ошибке
-                }
-            } catch (error) {
-                // Если произошла сетевая ошибка
-                errorMessage.style.display = 'block'; // Показываем сообщение об ошибке
-                console.error('Ошибка при отправке формы:', error);
+      fetch(event.target.action, {
+        method: form.method,
+        body: data,
+        headers: {
+            'Accept': 'application/json'
+        }
+      }).then(response => {
+        if (response.ok) {
+          // Если всё ок: показываем сообщение об успехе и скрываем форму
+          statusSuccess.style.display = "block";
+          statusError.style.display = "none";
+          form.reset(); // Очищаем поля
+          form.style.display = "none"; // Можно скрыть форму совсем после успеха
+        } else {
+          // Если Formspree вернул ошибку
+          response.json().then(data => {
+            if (Object.hasOwn(data, 'errors')) {
+              statusError.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+            } else {
+              statusError.style.display = "block";
             }
-        });
+          })
+        }
+      }).catch(error => {
+        // Если ошибка сети
+        statusError.style.display = "block";
+        statusError.innerHTML = "Oups! Un problème est survenu.";
+      }).finally(() => {
+        submitButton.value = "Envoyer le message";
+        submitButton.disabled = false;
+      });
     }
+
+    form.addEventListener("submit", handleSubmit)
 </script>
+    
 </body>
 
 
